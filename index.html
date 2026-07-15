@@ -43,32 +43,9 @@
   }
   .sub{color:var(--muted); font-size:17px; max-width:480px; margin:0 auto 40px;}
 
-  .mock{
-    position:relative; width:220px; height:440px; margin:0 auto 48px;
-    border:3px solid var(--border); border-radius:36px; background:var(--bg2);
-    box-shadow:0 20px 60px rgba(0,0,0,.5); overflow:hidden;
-  }
-  .mock .screen{
-    position:absolute; inset:8px; border-radius:28px;
-    background:radial-gradient(ellipse at 50% 30%, #1a2450 0%, #060911 70%);
-    overflow:hidden;
-  }
-  .mock .screen::before{
-    content:""; position:absolute; inset:0; opacity:.9;
-    background-image:
-      radial-gradient(2px 2px at 30px 60px,#fff,transparent),
-      radial-gradient(1.5px 1.5px at 80px 120px,#fff,transparent),
-      radial-gradient(2px 2px at 140px 90px,#fff,transparent),
-      radial-gradient(1.5px 1.5px at 170px 200px,#fff,transparent),
-      radial-gradient(2px 2px at 60px 260px,#fff,transparent),
-      radial-gradient(1.5px 1.5px at 120px 320px,#fff,transparent),
-      radial-gradient(2px 2px at 40px 340px,#fff,transparent),
-      radial-gradient(1.5px 1.5px at 180px 40px,#fff,transparent);
-  }
-  .mock .screen svg{position:absolute; inset:0; width:100%; height:100%;}
-  .mock .caption{
-    position:absolute; bottom:18px; left:0; right:0; text-align:center;
-    font-size:11px; color:var(--accent); letter-spacing:.05em; text-transform:uppercase;
+  .hero-img{
+    display:block; width:100%; max-width:360px; margin:0 auto 48px;
+    border-radius:22px; box-shadow:0 20px 60px rgba(0,0,0,.5);
   }
 
   .features{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:44px; text-align:left;}
@@ -98,32 +75,8 @@
   <h1>Draw a picture<br>from real stars</h1>
   <p class="sub">Point your camera at the sky. Connect the stars with your finger into your own constellation. Name it, save it — or gift it to someone who matters.</p>
 
-  <div class="mock">
-    <div class="screen">
-      <svg viewBox="0 0 220 300">
-        <!-- сама лінія-сузір'я -->
-        <polyline points="40,60 90,90 70,150 130,170 110,230" fill="none" stroke="#ffd166" stroke-width="2" stroke-linecap="round" opacity="0.85"/>
-        <!-- зірки з нумерацією -->
-        <circle cx="40" cy="60" r="3" fill="#fff"/>
-        <text x="47" y="58" font-size="11" fill="#7ea8ff" font-family="ui-monospace,monospace">1</text>
-        <circle cx="90" cy="90" r="3" fill="#fff"/>
-        <text x="97" y="88" font-size="11" fill="#7ea8ff" font-family="ui-monospace,monospace">2</text>
-        <circle cx="70" cy="150" r="3" fill="#fff"/>
-        <text x="77" y="148" font-size="11" fill="#7ea8ff" font-family="ui-monospace,monospace">3</text>
-        <circle cx="130" cy="170" r="3" fill="#fff"/>
-        <text x="137" y="168" font-size="11" fill="#7ea8ff" font-family="ui-monospace,monospace">4</text>
-        <!-- активна зірка — палець торкається, підсвітка й номер -->
-        <circle cx="110" cy="230" r="22" fill="none" stroke="#ffd166" stroke-width="1" opacity="0.25"/>
-        <circle cx="110" cy="230" r="13" fill="none" stroke="#ffd166" stroke-width="1.5" opacity="0.55"/>
-        <circle cx="110" cy="230" r="4" fill="#ffd166"/>
-        <text x="120" y="226" font-size="13" font-weight="700" fill="#ffd166" font-family="ui-monospace,monospace">5</text>
-        <!-- стилізований палець, що торкається зірки -->
-        <rect x="102" y="234" width="16" height="42" rx="8" fill="#e8ecf7" opacity="0.9"/>
-        <ellipse cx="110" cy="234" rx="8" ry="7" fill="#e8ecf7" opacity="0.9"/>
-      </svg>
-    </div>
-    <div class="caption">★ 5 counted — your StarPic</div>
-  </div>
+  <img class="hero-img" src="starpic_mockup.png" alt="StarPic app: tap the stars, count them, draw your own constellation">
+
 
   <div class="features">
     <div class="feat"><div class="ico">🔭</div><div class="t">Real sky, in real time</div><div class="d">An AR star map based on your location — wherever you are.</div></div>
