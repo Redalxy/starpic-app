@@ -88,6 +88,17 @@
   }
   .modal-card input:focus{outline:2px solid var(--accent2); border-color:var(--accent2);}
   .modal-card input::placeholder{color:var(--muted);}
+
+  .combo{position:relative;}
+  .combo-list{
+    display:none; position:absolute; left:0; right:0; top:100%; margin-top:-8px; z-index:5;
+    max-height:190px; overflow-y:auto; background:var(--bg2); border:1px solid var(--border);
+    border-radius:10px; box-shadow:0 12px 30px rgba(0,0,0,.4); text-align:left;
+  }
+  .combo-list.open{display:block;}
+  .combo-item{padding:9px 14px; font-size:14px; cursor:pointer; color:var(--text);}
+  .combo-item:hover, .combo-item.active{background:var(--card); color:var(--accent2);}
+  .combo-empty{padding:9px 14px; font-size:13px; color:var(--muted);}
   .modal-submit{
     width:100%; padding:13px; border:none; border-radius:10px; margin-top:4px;
     background:linear-gradient(90deg,var(--accent2),var(--accent)); color:#0a0e1a;
@@ -135,7 +146,10 @@
       <p class="m-sub">Leave your details and we'll notify you the moment StarPic launches.</p>
       <form id="leadForm">
         <input type="text" id="fName" placeholder="Your name" required autocomplete="name">
-        <input type="text" id="fCountry" placeholder="Country" required autocomplete="country-name">
+        <div class="combo">
+          <input type="text" id="fCountry" placeholder="Country" required autocomplete="off">
+          <div class="combo-list" id="countryList"></div>
+        </div>
         <input type="email" id="fEmail" placeholder="Email" required autocomplete="email">
         <button type="submit" class="modal-submit" id="modalSubmitBtn">Get Early Access</button>
         <div class="modal-err" id="modalErr"></div>
@@ -162,6 +176,65 @@
   var form = document.getElementById("leadForm");
   var errBox = document.getElementById("modalErr");
   var submitBtn = document.getElementById("modalSubmitBtn");
+
+  // --- Country combobox: пошук + випадаючий список ---
+  var COUNTRIES = ["Afghanistan","Albania","Algeria","Andorra","Angola","Antigua and Barbuda",
+    "Argentina","Armenia","Australia","Austria","Azerbaijan","Bahamas","Bahrain","Bangladesh",
+    "Barbados","Belarus","Belgium","Belize","Benin","Bhutan","Bolivia","Bosnia and Herzegovina",
+    "Botswana","Brazil","Brunei","Bulgaria","Burkina Faso","Burundi","Cabo Verde","Cambodia",
+    "Cameroon","Canada","Central African Republic","Chad","Chile","China","Colombia","Comoros",
+    "Congo (DRC)","Congo (Republic)","Costa Rica","Croatia","Cuba","Cyprus","Czechia","Denmark",
+    "Djibouti","Dominica","Dominican Republic","Ecuador","Egypt","El Salvador",
+    "Equatorial Guinea","Eritrea","Estonia","Eswatini","Ethiopia","Fiji","Finland","France",
+    "Gabon","Gambia","Georgia","Germany","Ghana","Greece","Grenada","Guatemala","Guinea",
+    "Guinea-Bissau","Guyana","Haiti","Honduras","Hong Kong","Hungary","Iceland","India",
+    "Indonesia","Iran","Iraq","Ireland","Israel","Italy","Ivory Coast","Jamaica","Japan",
+    "Jordan","Kazakhstan","Kenya","Kiribati","Kosovo","Kuwait","Kyrgyzstan","Laos","Latvia",
+    "Lebanon","Lesotho","Liberia","Libya","Liechtenstein","Lithuania","Luxembourg",
+    "Madagascar","Malawi","Malaysia","Maldives","Mali","Malta","Marshall Islands",
+    "Mauritania","Mauritius","Mexico","Micronesia","Moldova","Monaco","Mongolia",
+    "Montenegro","Morocco","Mozambique","Myanmar","Namibia","Nauru","Nepal","Netherlands",
+    "New Zealand","Nicaragua","Niger","Nigeria","North Korea","North Macedonia","Norway",
+    "Oman","Pakistan","Palau","Palestine","Panama","Papua New Guinea","Paraguay","Peru",
+    "Philippines","Poland","Portugal","Qatar","Romania","Russia","Rwanda",
+    "Saint Kitts and Nevis","Saint Lucia","Saint Vincent and the Grenadines","Samoa",
+    "San Marino","Sao Tome and Principe","Saudi Arabia","Senegal","Serbia","Seychelles",
+    "Sierra Leone","Singapore","Slovakia","Slovenia","Solomon Islands","Somalia",
+    "South Africa","South Korea","South Sudan","Spain","Sri Lanka","Sudan","Suriname",
+    "Sweden","Switzerland","Syria","Taiwan","Tajikistan","Tanzania","Thailand","Timor-Leste",
+    "Togo","Tonga","Trinidad and Tobago","Tunisia","Turkey","Turkmenistan","Tuvalu","Uganda",
+    "Ukraine","United Arab Emirates","United Kingdom","United States","Uruguay","Uzbekistan",
+    "Vanuatu","Vatican City","Venezuela","Vietnam","Yemen","Zambia","Zimbabwe"];
+
+  var countryInput = document.getElementById("fCountry");
+  var countryList = document.getElementById("countryList");
+
+  function renderCountryList(query){
+    var q = query.trim().toLowerCase();
+    var matches = q ? COUNTRIES.filter(function(c){ return c.toLowerCase().indexOf(q) !== -1; }) : COUNTRIES;
+    countryList.innerHTML = "";
+    if(!matches.length){
+      countryList.innerHTML = '<div class="combo-empty">No matching country</div>';
+    } else {
+      matches.slice(0, 50).forEach(function(name){
+        var item = document.createElement("div");
+        item.className = "combo-item";
+        item.textContent = name;
+        item.addEventListener("mousedown", function(ev){
+          ev.preventDefault();               // не даємо input втратити фокус до кліку
+          countryInput.value = name;
+          countryList.classList.remove("open");
+        });
+        countryList.appendChild(item);
+      });
+    }
+    countryList.classList.add("open");
+  }
+  countryInput.addEventListener("focus", function(){ renderCountryList(countryInput.value); });
+  countryInput.addEventListener("input", function(){ renderCountryList(countryInput.value); });
+  countryInput.addEventListener("blur", function(){
+    setTimeout(function(){ countryList.classList.remove("open"); }, 120);
+  });
 
   function openModal(){
     formBox.style.display = "";
