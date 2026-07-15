@@ -77,6 +77,7 @@
   <img class="hero-img" src="starpic_mockup.png" alt="StarPic app: tap the stars, count them, draw your own constellation">
   <p class="sub">Point your camera at the sky. Count the stars in real time. Connect them with your finger into your own constellation. Name it, save it — or gift it to someone who matters.</p>
 
+  <a class="cta download-btn" href="#" target="_blank" rel="noopener" style="margin-bottom:44px;">📲 Download App</a>
 
   <div class="features">
     <div class="feat"><div class="ico">🔭</div><div class="t">Real sky, in real time</div><div class="d">An AR star map based on your location — wherever you are.</div></div>
@@ -86,7 +87,7 @@
     <div class="feat" style="grid-column:1 / -1;"><div class="ico">🎵</div><div class="t">Chill music under the stars</div><div class="d">A calming soundtrack you can switch to match your mood.</div></div>
   </div>
 
-  <a class="cta" id="downloadBtn" href="#" target="_blank" rel="noopener">📲 Download the app</a>
+  <a class="cta download-btn" href="#" target="_blank" rel="noopener">📲 Download the app</a>
   <div class="cta-note">Sign up now — get early access when we launch ✨</div>
 
   <footer>StarPic · 2026</footer>
@@ -95,13 +96,15 @@
 <script>
   // GOOGLE_FORM_URL — paste the Google Form link here (Name/Country/Email)
   var GOOGLE_FORM_URL = "GOOGLE_FORM_URL_PLACEHOLDER";
-  document.getElementById("downloadBtn").addEventListener("click", function(ev){
+  document.querySelectorAll(".download-btn").forEach(function(btn){
+    btn.addEventListener("click", function(ev){
     ev.preventDefault();
     try{
       var n = parseInt(localStorage.getItem("starpic_clicks")||"0",10) + 1;
       localStorage.setItem("starpic_clicks", n);
     }catch(_){}
     window.open(GOOGLE_FORM_URL, "_blank", "noopener");
+    });
   });
 </script>
 </body>
