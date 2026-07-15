@@ -65,6 +65,39 @@
   .cta-note{color:var(--muted); font-size:12.5px; margin-top:14px;}
 
   footer{color:var(--muted); font-size:12px; margin-top:56px;}
+
+  .modal-overlay{
+    display:none; position:fixed; inset:0; z-index:30; background:rgba(6,9,17,.75);
+    align-items:center; justify-content:center; padding:20px; backdrop-filter:blur(3px);
+  }
+  .modal-card{
+    position:relative; width:100%; max-width:380px; background:var(--card);
+    border:1px solid var(--border); border-radius:20px; padding:32px 28px;
+    box-shadow:0 20px 60px rgba(0,0,0,.5); text-align:center;
+  }
+  .modal-close{
+    position:absolute; top:14px; right:16px; background:none; border:none; color:var(--muted);
+    font-size:20px; cursor:pointer; line-height:1; padding:4px;
+  }
+  .modal-close:hover{color:var(--text);}
+  .modal-card h3{font-size:20px; margin:0 0 6px;}
+  .modal-card .m-sub{color:var(--muted); font-size:13.5px; margin:0 0 22px;}
+  .modal-card input{
+    width:100%; padding:12px 14px; margin-bottom:12px; border-radius:10px; border:1px solid var(--border);
+    background:var(--bg2); color:var(--text); font-size:15px; font-family:inherit;
+  }
+  .modal-card input:focus{outline:2px solid var(--accent2); border-color:var(--accent2);}
+  .modal-card input::placeholder{color:var(--muted);}
+  .modal-submit{
+    width:100%; padding:13px; border:none; border-radius:10px; margin-top:4px;
+    background:linear-gradient(90deg,var(--accent2),var(--accent)); color:#0a0e1a;
+    font-size:15.5px; font-weight:800; cursor:pointer; font-family:inherit;
+  }
+  .modal-submit:disabled{opacity:.6; cursor:wait;}
+  .modal-err{color:#f87171; font-size:12.5px; margin-top:10px; min-height:16px;}
+  .modal-success .m-icon{font-size:40px; margin-bottom:12px;}
+  .modal-success h3{margin-bottom:8px;}
+  .modal-success p{color:var(--muted); font-size:14px; margin:0;}
 </style>
 </head>
 <body>
@@ -93,18 +126,98 @@
   <footer>StarPic · 2026</footer>
 </div>
 
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-card">
+    <button class="modal-close" id="modalClose" aria-label="Close">✕</button>
+
+    <div id="modalForm">
+      <h3>✨ Get Early Access</h3>
+      <p class="m-sub">Leave your details and we'll notify you the moment StarPic launches.</p>
+      <form id="leadForm">
+        <input type="text" id="fName" placeholder="Your name" required autocomplete="name">
+        <input type="text" id="fCountry" placeholder="Country" required autocomplete="country-name">
+        <input type="email" id="fEmail" placeholder="Email" required autocomplete="email">
+        <button type="submit" class="modal-submit" id="modalSubmitBtn">Get Early Access</button>
+        <div class="modal-err" id="modalErr"></div>
+      </form>
+    </div>
+
+    <div id="modalSuccess" class="modal-success" style="display:none;">
+      <div class="m-icon">🎉</div>
+      <h3>You're on the list!</h3>
+      <p>We'll email you as soon as StarPic launches.</p>
+    </div>
+  </div>
+</div>
+
 <script>
-  // GOOGLE_FORM_URL — paste the Google Form link here (Name/Country/Email)
-  var GOOGLE_FORM_URL = "GOOGLE_FORM_URL_PLACEHOLDER";
+  // Google Form — фонова відправка без переходу на сторінку Google.
+  // ID взяті з "Get pre-filled link" твоєї форми.
+  var FORM_ACTION = "https://docs.google.com/forms/d/e/1FAIpQLSe9ORRu7tbr4g4FQ8_sHlWpn5flgjuHUoZ5U-5OJk1_m2OlWQ/formResponse";
+  var ENTRY = { name: "entry.850859998", country: "entry.748162987", email: "entry.500280583" };
+
+  var overlay = document.getElementById("modalOverlay");
+  var formBox = document.getElementById("modalForm");
+  var successBox = document.getElementById("modalSuccess");
+  var form = document.getElementById("leadForm");
+  var errBox = document.getElementById("modalErr");
+  var submitBtn = document.getElementById("modalSubmitBtn");
+
+  function openModal(){
+    formBox.style.display = "";
+    successBox.style.display = "none";
+    errBox.textContent = "";
+    form.reset();
+    overlay.style.display = "flex";
+  }
+  function closeModal(){ overlay.style.display = "none"; }
+
   document.querySelectorAll(".download-btn").forEach(function(btn){
     btn.addEventListener("click", function(ev){
-    ev.preventDefault();
-    try{
-      var n = parseInt(localStorage.getItem("starpic_clicks")||"0",10) + 1;
-      localStorage.setItem("starpic_clicks", n);
-    }catch(_){}
-    window.open(GOOGLE_FORM_URL, "_blank", "noopener");
+      ev.preventDefault();
+      try{
+        var n = parseInt(localStorage.getItem("starpic_clicks")||"0",10) + 1;
+        localStorage.setItem("starpic_clicks", n);
+      }catch(_){}
+      openModal();
     });
+  });
+
+  document.getElementById("modalClose").addEventListener("click", closeModal);
+  overlay.addEventListener("click", function(ev){ if(ev.target === overlay) closeModal(); });
+
+  form.addEventListener("submit", function(ev){
+    ev.preventDefault();
+    errBox.textContent = "";
+    var name = document.getElementById("fName").value.trim();
+    var country = document.getElementById("fCountry").value.trim();
+    var email = document.getElementById("fEmail").value.trim();
+    if(!name || !country || !email){
+      errBox.textContent = "Please fill in all fields.";
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Sending…";
+
+    var body = new URLSearchParams();
+    body.append(ENTRY.name, name);
+    body.append(ENTRY.country, country);
+    body.append(ENTRY.email, email);
+
+    // mode:"no-cors" — Google Forms не дозволяє читати відповідь з іншого домену,
+    // тож запит іде "наосліп": браузер не кидає помилку зазвичай, якщо мережа жива.
+    fetch(FORM_ACTION, { method: "POST", mode: "no-cors", body: body })
+      .then(function(){
+        try{ localStorage.setItem("starpic_lead_sent", "1"); }catch(_){}
+        formBox.style.display = "none";
+        successBox.style.display = "";
+      })
+      .catch(function(){
+        errBox.textContent = "Something went wrong. Please try again.";
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Get Early Access";
+      });
   });
 </script>
 </body>
